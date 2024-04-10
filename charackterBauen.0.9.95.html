@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no">
+  <link rel="stylesheet" href="css/polygonmaker.0.0.2.css">
+  <link rel="stylesheet" href="css/charaktermaker.0.0.2.css">
+  <title>CharakterBauen.0.9.95</title>
+  <script>
+  	CB = {}
+  	
+  	CB.Init = function(){
+ 	 	PM.PolygonMakerInit();
+  		CB.Pattern.Schablonen.Init();
+  		CB.GegnerSchablone.PatternErstellen();
+  		CB.GegnerSchablone.FarbenErstellen();
+  		CB.CanvasElemente.StempelInit();
+  		CB.BildEbenen.Erstellen();
+  		CB.CanvasElemente.MalDieBilder("Alle");
+  		AM.LoopObjekt = window.setInterval("AM.Loop()",1000/AM.BPS.Value);
+  		AM.Check();
+  		CB.BildEbenen.DefaultSelection();
+	}
+	
+  	CB.AusgewaehlterCharakter = "TestFigur";
+  	let AktuelleCharakter = CB.AusgewaehlterCharakter;
+  </script>
+  </head>
+  <body onload="CB.Init()">
+  <div id="CanvasJetztContainer"></div>
+  	<div id="PatternCanvasContainer"></div>
+  	<div id="BilderDownloadContainer" style="display:none;">
+  		<a href="Kugel.png" download >
+  		<div id="TestDiv"></div>
+  		</a>
+  	</div>
+  	<div id="Welt">
+
+		<div id ="DM_MainContainer">
+			<div id="DM_MainButtonBox">
+				<div id="DM_GibDenCodeRausButton" class="nonSelect" onclick="DM.GibDenCodeRaus(AktuelleCharakter)">Save</div>
+				<div id="DM_GibDenCodeReinContainerButton" class="nonSelect" onclick="DM.GibDenCodeReinContainerCheck()">Load</div>
+			</div>
+			<div id="DM_Code"></div>
+			<div id="DM_CodeWiederAusmachenButton" class="nonSelect" onclick="DM.CodeWiederAusmachen()">X</div>
+			<div id="DM_GibDenCodeReinContainer">
+				<div id="DM_GibDenCodeReinButton" onclick="DM.GibDenCodeRein()" class="nonSelect">Laden</div>
+				<input id="DM_GibDenCodeReinInput" value="" class="nonSelect"></input>
+				<div id="DM_GibDenCodeReinContainerSchliessenButton" onclick="DM.GibDenCodeReinContainerCheck()" class="nonSelect">X</div>
+			</div>
+		</div>
+		
+	  	<div id="BildContainer"></div>
+	  	<div id="BildEbenen_MainContainer"></div>
+  			
+		<div id="AktuelleBildAuswahl" onclick="SagDas()" class="nonSelect">
+			<img id="AktuelleBildAuswahlBild" class="bild" src="">
+		</div>
+		<div id="BilderDownloadButton" onclick="BilderDownload()" class="nonSelect">Download</div>
+		<div id="DateienOeffnenButton" onclick="CB.Dateien.Check()" class="nonSelect">Dateien</div>
+		<div id="AlleElementeLoeschenButton" onclick="CB.Elemente.BildElementeLoeschenAbfrage()" class="nonSelect">Alle Elemente Loeschen</div>
+		<div id="FarbenContainerButton" onclick="CB.Farben.Check()" class="nonSelect">Farben</div>
+		<div id="StempelContainer_Button" onclick="CB.Stempel.Check()" class="nonSelect">Stempel</div>
+		<div id="PatternContainerButton" onclick="CB.Pattern.Check()" class="nonSelect">Pattern</div>
+		<div id="PolygoneContainerButton" onclick="PM.PolygoneContainerCheck()" class="nonSelect">Polygone</div>
+  		
+  		<div id="DateienContainer">
+  			<div id="DateinContainerAnzeige"></div>
+  			<div id="DateinContainerSchliessenButton" onclick="CB.Dateien.Check()">X</div>
+  		</div>
+  		
+  		<div id="FarbenContainer_MainContainer">
+  			<div id="FarbenContainer_AlleFarbenContainer"></div>
+  			<div id="FarbenContainer_FarbenAnzeigeContainer">
+	  			<div id="FarbenContainer_FarbThumpnailContainer">
+	  				<img id="FarbenContainer_FarbThumpnail" src="">
+	  			</div>
+	  			<div id="FarbenContainer_FuellungThumpnailContainer">
+	  				<canvas id="FarbenContainer_FuellungThumpnail" ></canvas>
+	  			</div>
+	  			<input id="FarbenContainer_NameAendernInput" value="" onchange="CB.Farben.NameAendern()">
+	  			<input id="FarbenContainer_ValueAendernInput" value="" onchange="CB.Farben.ValueAendern()">
+	  			<div id="FarbenContainer_FarbsucherButton" onclick="FS.Check('FarbenContainer_ValueAendernInput')">Farbe Aussuchen</div>
+  				<div id="FarbenContainer_FuellungenContainer">
+		  			<div id="FarbenContainer_FuellungenAnzeigeContainer"></div>
+			  		<div id="FarbenContainer_FuellungHinzufuegenButton" onclick="CB.Farben.Fuellungen.Erstellen()">Fuellung Hinzufuegen</div>
+			  		<select name="FarbenContainer_FuellungHinzufuegenTypInput" id="FarbenContainer_FuellungHinzufuegenTypInput">
+			  			<option value="Radial">Radial</option>
+			  			<option value="Linear">Linear</option>
+			  			<option value="Pattern">Pattern</option>
+		  			</select>
+		  			<select name="FarbenContainer_FuellungHinzufuegenEbeneInput" id="FarbenContainer_FuellungHinzufuegenEbeneInput"></select>
+	  			</div>
+	  			<div id="FarbenContainer_FuellungenBearbeitenContainer">
+	  				<div id="FarbenContainer_FuellungenBearbeitenContainerAnzeige"></div>
+	  				<div id="FarbenContainer_FuellungenBearbeitenContainerDieseFuellungLoeschenButton" onclick="CB.Farben.Fuellungen.Loeschen()">Fuellung Loeschen</div>
+	  				<div id="FarbenContainer_FuellungenBearbeitenContainerDieseFuellungVerschiebenHochButton" onclick="CB.Farben.Fuellungen.Verschieben('hoch')">↑</div>
+	  				<div id="FarbenContainer_FuellungenBearbeitenContainerDieseFuellungVerschiebenRunterButton" onclick="CB.Farben.Fuellungen.Verschieben('runter')">↓</div>
+	  				<div id="FarbenContainer_FuellungenBearbeitenContainerDiesenTimestopLoeschenButton" onclick="CB.Farben.Fuellungen.Colorstop.Loeschen()">Timestop Loeschen</div>
+	  				<div id="FarbenContainer_FuellungenBearbeitenContainerDiesenTimestopHinzufuegenButton" onclick="CB.Farben.Fuellungen.Colorstop.Hinzuguegen()">Timestop Hinzufuegen</div>
+	  				<div id="FarbenContainer_FuellungenBearbeitenContainerSchliessenButton" onclick="CB.Farben.Fuellungen.BearbeitungsContainer.Check()">X</div>
+	  			</div>
+  			</div>
+  			<div id="FarbenContainer_NeueFarbeContainer">
+  				<div id="FarbenContainer_NeueFarbeContainer_FarbenNameContainer">
+  					<div id="FarbenContainer_NeueFarbeContainer_FarbenNameContainer_FarbenNameLable" onclick="FarbenContainer_NeueFarbeContainer_FarbenNameContainer_FarbenNameInput.select()">Name:</div>
+  					<input id="FarbenContainer_NeueFarbeContainer_FarbenNameContainer_FarbenNameInput" value="Name">
+  				</div>
+  				<div id="FarbenContainer_NeueFarbeContainer_FarbenValueContainer">
+  					<div id="FarbenContainer_NeueFarbeContainer_FarbenValueContainer_FarbenValueLable" onclick="FarbenContainer_NeueFarbeContainer_FarbenValueContainer_FarbenValueInput.select()">Value:</div>
+  					<input id="FarbenContainer_NeueFarbeContainer_FarbenValueContainer_FarbenValueInput" value="rgba(0,0,0,1)">
+  				</div>
+  				<div id="FarbenContainer_DieseFarbeErstellenButton" onclick="CB.Farben.Erstellen()">Farbe Erstellen</div>
+  				<div id="FarbenContainer_NeueFarbeContainerSchliessenButton" onclick="CB.Farben.NeueFarbeContainer.Check()">X</div>
+  			</div>
+  			<div id="FarbenContainer_DieseFarbeLoeschenButton" onclick="CB.Farben.Loeschen()">Farbe Loeschen</div>
+  			<div id="FarbenContainer_DieseFarbeDuplizierenButton" onclick="CB.Farben.Duplizieren()">Farbe Duplizieren</div>
+  			<div id="FarbenContainer_NeueFarbeContainerButton" onclick="CB.Farben.NeueFarbeContainer.Check()">Neue Farbe</div>
+  			<div id="FarbenContainer_SchliessenButton" onclick="CB.Farben.Check()">X</div>
+		</div>
+		
+		<div id="StempelContainer_MainContainer">
+			<div id="StempelContainer_AlleStempelContainer"></div>
+			<input id="StempelContainer_NameAendernInput" value="" onchange="CB.Stempel.NameAendern()">
+			<div id="StempelContainer_SchliessenButton" onclick="CB.Stempel.Check()">X</div>
+			<div id="StempelContainer_DieseStempelLoeschenButton" onclick="CB.Stempel.Loeschen()">Stempel Loeschen</div>
+			<div id="StempelContainer_DieseStempelBearbeitenButton" onclick="CB.Stempel.Bearbeiten()">Stempel Bearbeiten</div>
+			<div id="StempelContainer_DieseStempelDuplizierenButton" onclick="CB.Stempel.Duplizieren()">Stempel Duplizieren</div>
+			<canvas id="StempelContainer_CanvasAnzeigeGross"></canvas>
+			<div id="StempelContainer_NeueStempelContainer">
+				<div id="StempelContainer_NeueStempelNameContainer">
+					<div id="StempelContainer_NeueStempelNameLable" onclick="StempelContainer_NeueStempelNameInput.select()">Name:</div>
+					<input id="StempelContainer_NeueStempelNameInput" value="Name">
+				</div>
+				<div id="StempelContainer_DieseStempelErstellenButton" onclick="CB.Stempel.Erstellen()">Stempel Erstellen</div>
+				<div id="StempelContainer_NeueStempelContainerSchliessenButton" onclick="CB.Stempel.NeuerStempelContainerCheck()">X</div>
+			</div>
+			<div id="StempelContainer_NeueStempelContainerButton" onclick="CB.Stempel.NeuerStempelContainerCheck()">Neuer Stempel</div>
+		</div>
+		
+		<dialog id="TauschDenStempelAus">
+			<div id="TauschDenStempelAusAlterName"></div>
+			<div id="TauschDenStempelAusButton" onclick="">Stempel Austauschen</div>
+			<select id="TauschDenStempelAusSelectFeld"></select>
+			<div id="TauschDenStempelAusSchliessenButton" onclick="$('TauschDenStempelAus').close()">X</div>
+			<div id="TauschDenStempelAusFuerAlleCheckboxContainer">
+				<div id="TauschDenStempelAusFuerAlleCheckboxLable">Alle Stempel mit diesen Namen Aendern</div>
+				<input id="TauschDenStempelAusFuerAlleCheckbox" name="TauschDenStempelAusFuerAlleCheckbox" type="checkbox" />
+			</div>
+		</dialog>
+		
+		<div id="PatternContainer_MainContainer">
+			<div id="PatternContainer_AllePatternContainer"></div>
+			<canvas id="PatternContainer_AnzeigeCanvas"></canvas>
+	 		<input id="PatternContainer_NameAendernInput" value="" onchange="CB.Pattern.NameAendern()">
+	 		<select id="PatternContainer_TexturAendernInput" value="" onchange="CB.Pattern.ValueAendern('PatternContainer_TexturAendernInput',0)"></select>
+	 		<input id="PatternContainer_FarbeAendernInput" value="" onchange="CB.Pattern.ValueAendern('PatternContainer_FarbeAendernInput',1)">
+			<div id="PatternContainer_FarbsucherButton" onclick="FS.Check('PatternContainer_FarbeAendernInput')">Farbe Aussuchen</div>
+			<div id="PatternContainer_SchliessenButton" onclick="CB.Pattern.Check()">X</div>
+			<div id="PatternContainer_DiesePatternLoeschenButton" onclick="CB.Pattern.Loeschen()">Diesen Pattern Loeschen</div>
+			<div id="PatternContainer_NeuePatternContainer">
+	  			<div id="PatternContainer_NeuePatternNameContainer">
+						<div id="PatternContainer_NeuePatternNameLable" onclick="PatternContainer_NeuePatternNameInput.select()">Name:</div>
+						<input id="PatternContainer_NeuePatternNameInput" value="Namek">
+				</div>
+				<div id="PatternContainer_NeuePatternErstellenButton" onclick="CB.Pattern.Erstellen()">Pattern Erstellen</div>
+				<div id="PatternContainer_NeuePatternContainerSchliessenButton" onclick="CB.Pattern.NeuePatternContainerCheck()">X</div>
+			</div>
+			<div id="PatternContainer_NeuePatternContainerButton" onclick="CB.Pattern.NeuePatternContainerCheck()">Neuer Pattern</div>
+		</div>
+		
+  		<div id="CanvasElementContainer"></div>
+  		
+  		<div id="OptionsContainer">
+  			<div id="OptionsContainerId" class="nonSelect"></div>
+  			<div id="OptionsContainerAnzeige" class="nonSelect"></div>
+  		</div>
+  		
+  		<div id="ElementCreationContainer">
+  			<div id="ElementCreationContainerAnzeige" class="nonSelect"></div>
+  			<div id="ElementCreationContainerSchliessenButton" onclick="CB.ElementCreation.Check()">X</div>
+  		</div>
+  		
+  	</div>
+  	<div id="Bilder" style="display:none;"></div>
+  	<div id="AllerErstellungsCanvassesContainer" style="display:none;"></div>
+  	<div id="AllerErstellungsImagesContainer" style="display:none;"></div>
+  	<div id="StempelCanvasElementContainer" style="display:none;"></div>
+  	
+  	<div id="PM_MainContainer" style="display:none;">
+	  	<div id="PM_Buttons">
+		  	<button id="PM_NewCanvasButton" onclick="PM.NewPolygon()">Neues Bild</button>
+		  	<button id="PM_SaveButton" onclick="PM.SavePolygon()">Bild Speichern</button>
+		  	<button id="PM_DeleteCoordinateButton" onclick="PM.DeleteSelectedCoordinate()">Punkt löschen</button>
+		  	<button id="PM_UndoButton" onclick="PM.Undo()">Rückgängig machen</button>
+		  	<button id="PM_RestoreButton" onclick="PM.RestoreLastDeletedHistoryValue()">Wieder Herstellen</button>
+		  	<button id="PM_ToggleCirclesButton" onclick="PM.ToggleCircles()">Kreise ausblenden</button>
+		  	<button id="PM_ApplyInbetweenPointsToPolygonButton" onclick="PM.ApplyInbetweenPointsToPolygon(PM.Coordinates)">Zwischen Punkte</button>
+		  	<button id="PM_ApplyCurveSmoothingToPolygonButton" onclick="PM.ApplyCurveSmoothingToPolygon()">Kurven glätten</button>
+	  	</div>
+	  	<canvas id="PM_Canvas" width=400 height=400 class="PM_MainCanvasDisplay PM_ChessPattern "></canvas>
+	  	<div id="PM_IdChangeContainer">
+		  	<input id="PM_ImageIDInput" type="text" value="1" />
+		  	<button id="PM_ChangeImageIDButton" onclick="PM.ChangeImageID()">Ändern</button>
+	  	</div>
+	  	<div id="PM_SizeDisplay">
+		  	<label for="PM_CanvasWidthInput">Breite:</label>
+		  	<input type="number" id="PM_CanvasWidthInput" value="400" onchange="PM.UpdateCanvasSize()" />
+		  	<label for="PM_CanvasHeightInput">Höhe :</label>
+		  	<input type="number" id="PM_CanvasHeightInput" value="400" onchange="PM.UpdateCanvasSize()" />
+		  	<label for="PM_ScalePointsCheckbox">Skalieren:</label>
+		  	<input type="checkbox" id="PM_ScalePointsCheckbox" onchange="PM.ScalePointsOnChange()" />
+	  	</div>
+	  	<div id="PM_Controls">
+		  	<label for="PM_LineWidth">Linienbreite:</label>
+		  	<input type="range" id="PM_LineWidth" min="1" max="20" value="1" onchange="PM.UpdateConstructionValue('lineWidth', $('PM_LineWidth').value)" />
+		  	<label for="PM_LineColor">Linienfarbe:</label>
+		  	<input type="color" id="PM_LineColor" value="#000000" onchange="PM.UpdateConstructionValue('lineColor', $('PM_LineColor').value)" />
+		  	<label for="PM_LineAlpha">Linien-Alpha:</label>
+		  	<input type="range" id="PM_LineAlpha" min="0" max="1" step="0.1" value="1" onchange="PM.UpdateConstructionValue('lineAlpha', $('PM_LineAlpha').value)" />
+		  	<label for="PM_FillColor">Füllfarbe:</label>
+		  	<input type="color" id="PM_FillColor" value="#ffffff" onchange="PM.UpdateConstructionValue('fillColor', $('PM_FillColor').value)" />
+		  	<label for="PM_FillAlpha">Füll-Alpha:</label>
+		  	<input type="range" id="PM_FillAlpha" min="0" max="1" step="0.1" value="1" onchange="PM.UpdateConstructionValue('fillAlpha', $('PM_FillAlpha').value)" />
+	  	</div>
+	  	<div id="PM_MultiPointModeContainer">
+		  	<input type="checkbox" id="PM_MultiPointModeCheckbox" onchange="PM.ToggleMultiPointButtons()">
+		  	<label id="PM_MultiPointModeCheckboxLabel" for="PM_MultiPointModeCheckbox">SingePoint-Modus</label>
+		  	<button id="PM_DeselectAllCoordinatesButton" style="display:none;" onclick="PM.DeselectAllCoordinates()">Auswahl leeren</button>
+		  	<button id="PM_AddAllCoordinatesExceptSelectedButton" style="display:none;" onclick="PM.AddAllCoordinatesExceptSelected()">Alles Auswählen</button>
+	  	</div>
+	  	<button id="PM_CopyAndPastePolygonDataArrayIntoCacheButton" onclick="PM.CopyAndPastePolygonDataArrayIntoCache()">Array in den Arbeisspeicher</button>
+	  	<button id="PM_ClosePolygonMakerButton" onclick="PM.PolygoneContainerCheck()">X</button>
+	  	<div id="PM_PolygonContainer"></div>
+  	</div>
+
+	<dialog id="FS_MainContainer">
+		<canvas id="FS_AnzeigeCanvas"></canvas>
+		<div id="FS_AuswaehlenButton" onclick="FS.DieseFarbeAuswaehlen()">Diese Farbe Waehlen</div>
+		<div id="FS_FavcolorContainer">
+			<div id="FS_FavcolorLable">Grundfarbe Waehlen:</div>
+			<input type="color" id="FS_Favcolor" name="FS_Favcolor" value="#ff0000" onchange="FS.Favcolor()">
+		</div>
+		<div id="FS_OpacityContainer">	
+			<input type="range" id="FS_OpacityRegler" min="0" max="1" step="0.001" value="1" onchange="FS.ZeigDenValue('Regler')">
+			<input id="FS_OpacityValue" value="1" onchange="FS.ZeigDenValue('Value')">
+		</div>
+		<div id="FS_SchliessenButton" onclick="$('FS_MainContainer').close()">X</div>
+	</dialog>
+	
+	<div id="AM_MainContainer">
+		<div id="AM_StartenButton" onclick="AM.Check()" class="nonSelect"></div>
+		<div id="AM_KleinerMachenButton" onclick="AM.Groessen.Aendern(-1)" class="nonSelect">-</div>
+		<div id="AM_GroesserMachenButton" onclick="AM.Groessen.Aendern(1)" class="nonSelect">+</div>
+		<select name="AM_BPSInput" id="AM_BPSInput" onchange="AM.BPS.Aendern()" class="nonSelect">
+			<option value="1">1</option>
+			<option value="2">2</option>
+			<option value="4">4</option>
+			<option value="8">8</option>
+			<option value="12">12</option>
+			<option value="24">24</option>
+			<option value="60">60</option>
+		</select>
+		<div id="AM_BildContainer" onclick="AM.Check()" class="nonSelect">
+			<img id="AM_Bild" class="bild" src="">
+		</div>
+	</div>
+	
+	<div id="ElementMover_MainContainer">
+		<canvas id="ElementMover_Canvas" width="400" height="400"></canvas>
+		<div id="ElementMover_ManipulationsContainer">X</div>
+		<div id="ElementMover_SchliessenButton" onclick="ElementMover.Check()">X</div>
+	</div>
+	
+	<script src="scripts/OperationSystem.0.0.1.js"></script>
+	<script src="scripts/CB.BildEbenen.0.0.1.js"></script>
+	<script src="scripts/CB.Farben.0.0.2.js"></script>
+	<script src="scripts/CB.Stempel.0.0.1.js"></script>
+	<script src="scripts/CB.Pattern.0.0.1.js"></script>
+	<script src="scripts/CB.Dateien.0.0.1.js"></script>
+	<script src="scripts/CB.Elemente.0.0.1.js"></script>
+	<script src="scripts/CB.ElementCreation.0.0.1.js"></script>
+	<script src="scripts/ElementMover.0.0.1.js"></script>
+	<script src="scripts/AnimationMaker.0.0.1.js"></script>
+	<script src="scripts/BilderDownload.0.0.1.js"></script>
+  	<script src="scripts/Farbensucher.0.0.1.js"></script>
+  	<script src="scripts/CanvasElemente.0.0.5.js"></script>
+  	<script src="scripts/CB.GegnerSchablonen.0.0.2.js"></script>
+  	<script src="scripts/CB.Daten.0.0.3.js"></script>
+  	<script src="scripts/DataMover.0.0.1.js"></script>
+  	<script src="scripts/polygonmaker.0.0.2.js"></script>
+  </body>
+  </html>
